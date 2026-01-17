@@ -3,6 +3,7 @@
 #include "ops.hpp"
 #include "broadcast.hpp"
 #include "activations.hpp"
+#include "math_utils.hpp"
 
 struct SelectiveScanFusedParams {
   std::shared_ptr<Tensor> A_log;
