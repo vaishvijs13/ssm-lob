@@ -61,8 +61,6 @@ inline vector_int aligned_strides_for_broadcast(const vector_int& input_shape, c
 
   vector_int out_strides(r, 0);
   for (Size i = 0; i < r; i++) {
-    int dim = aligned_shape[i];
-
     if (i < pad) {
       out_strides[i] = 0;
       continue;

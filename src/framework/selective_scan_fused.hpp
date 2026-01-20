@@ -5,6 +5,22 @@
 #include "activations.hpp"
 #include "math_utils.hpp"
 
+//helper for gradient tracking with 7 tensors
+inline bool track_grad(
+  const std::shared_ptr<Tensor>& a,
+  const std::shared_ptr<Tensor>& b,
+  const std::shared_ptr<Tensor>& c,
+  const std::shared_ptr<Tensor>& d,
+  const std::shared_ptr<Tensor>& e,
+  const std::shared_ptr<Tensor>& f,
+  const std::shared_ptr<Tensor>& g
+) {
+  return grad_enabled() && (
+    a->req_grad || b->req_grad || c->req_grad || d->req_grad || 
+    e->req_grad || f->req_grad || g->req_grad
+  );
+}
+
 struct SelectiveScanFusedParams {
   std::shared_ptr<Tensor> A_log;
   std::shared_ptr<Tensor> log_dt;
@@ -152,7 +168,6 @@ selective_scan_fused_forward(
         vector_float du(D, 0.0f);
         
         for (int d = 0; d < D; d++) {
-          float h_t = h_all_ptr->flat((Size)t * D + d);
           float h_prev_val = (t > 0) ? h_all_ptr->flat((Size)(t-1) * D + d) : 0.0f;
           
           //recompute forward quantities
@@ -229,20 +244,4 @@ selective_scan_fused_forward(
   );
   
   return {y, h_final};
-}
-
-//helper
-inline bool track_grad(
-  const std::shared_ptr<Tensor>& a,
-  const std::shared_ptr<Tensor>& b,
-  const std::shared_ptr<Tensor>& c,
-  const std::shared_ptr<Tensor>& d,
-  const std::shared_ptr<Tensor>& e,
-  const std::shared_ptr<Tensor>& f,
-  const std::shared_ptr<Tensor>& g
-) {
-  return grad_enabled() && (
-    a->req_grad || b->req_grad || c->req_grad || d->req_grad || 
-    e->req_grad || f->req_grad || g->req_grad
-  );
 }

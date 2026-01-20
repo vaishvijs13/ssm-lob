@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
+#include "../framework/math_utils.hpp"
 
 //exx:
 struct TickFeatures {
@@ -12,26 +13,6 @@ struct TickFeatures {
   float mid_price_change;
   float book_depth[10];
 };
-
-//NO autograd here
-inline float softplus_f(float x, float threshold = 20.0f) {
-  if (x > threshold) return x;
-  return std::log1p(std::exp(x));
-}
-
-inline float sigmoid_f(float x) {
-  if (x >= 0.0f) {
-    float z = std::exp(-x);
-    return 1.0f / (1.0f + z);
-  } else {
-    float z = std::exp(x);
-    return z / (1.0f + z);
-  }
-}
-
-inline float clamp_f(float x, float lo, float hi) {
-  return std::max(lo, std::min(hi, x));
-}
 
 class StreamingSSM {
 public:
