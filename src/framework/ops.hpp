@@ -1,5 +1,6 @@
 #pragma once
 #include "tensor.hpp"
+#include "kernels/matmul_cpu.hpp"
 
 inline void assert_same_shape(const Tensor& a, const Tensor& b) {
   if (a.shape != b.shape) throw std::runtime_error("shape mismatch");
@@ -98,15 +99,7 @@ inline std::shared_ptr<Tensor> matmul2d(const std::shared_ptr<Tensor>& A, const 
 
   vector_float out((Size)M * (Size)N, 0.0f);
 
-  //forward matmul
-  for (int i = 0; i < M; i++) {
-    for (int k = 0; k < K; k++) {
-      float a_ik = A->flat((Size)i * K + k);
-      for (int j = 0; j < N; j++) {
-        out[(Size)i * N + j] += a_ik * B->flat((Size)k * N + j);
-      }
-    }
-  }
+  matmul_f32_nn(A->data.data(), B->data.data(), out.data(), M, K, N);
 
   bool req = track_grad(A, B);
   auto Y = std::make_shared<Tensor>(std::move(out), vector_int{M, N}, req);
