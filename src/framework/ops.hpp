@@ -99,7 +99,11 @@ inline std::shared_ptr<Tensor> matmul2d(const std::shared_ptr<Tensor>& A, const 
 
   vector_float out((Size)M * (Size)N, 0.0f);
 
-  matmul_f32_nn(A->data.data(), B->data.data(), out.data(), M, K, N);
+  //forward matmul
+  const float* Ap = A->storage->data() + A->offset;
+  const float* Bp = B->storage->data() + B->offset;
+  float* Cp = out.data();
+  matmul_f32_nn(Ap, Bp, Cp, M, K, N);
 
   bool req = track_grad(A, B);
   auto Y = std::make_shared<Tensor>(std::move(out), vector_int{M, N}, req);
