@@ -1,2 +1,5 @@
 .vscode/
-
+main.cpp
+ssm_demo
+demo
+Makefile

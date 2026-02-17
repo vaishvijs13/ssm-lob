@@ -21,3 +21,7 @@ inline float sigmoid_f(float x) {
 inline float clamp_f(float x, float lo, float hi) {
   return (x < lo) ? lo : (x > hi ? hi : x);
 }
+
+inline float silu_f(float x) {
+  return x * sigmoid_f(x);
+}

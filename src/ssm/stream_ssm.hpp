@@ -5,14 +5,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include "../framework/math_utils.hpp"
-
-//exx:
-struct TickFeatures {
-  float bid_ask_spread;
-  float order_flow_imbalance;
-  float mid_price_change;
-  float book_depth[10];
-};
+#include "types.hpp"
 
 class StreamingSSM {
 public:
