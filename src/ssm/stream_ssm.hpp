@@ -13,7 +13,7 @@ public:
     : D_(D), in_dim_(in_dim),
       h_(D, 0.0f),
 
-      //pararm
+      //param
       A_log_(D, 0.0f),
       log_dt_(D, -5.0f),
       B_(D, 1.0f),

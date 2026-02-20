@@ -1,10 +1,14 @@
-# Selective State Space Models for Limit Order Books
+# StreamSSM
 
-**Microsecond-latency C++ implementation of selective SSMs for tick-level order flow prediction**
+**Microsecond-Latency State Space Models for Real-Time Sequential Inference**
 
 ## Abstract
 
-This is a C++ implementation of selective state space models (SSMs) optimized for microsecond-latency order flow prediction in limit order books. While SSMs have shown promise in sequence modeling, existing implementations are limited to Python/PyTorch and operate on daily or minute-level data. We demonstrate that SSMs achieve **0.45–1.33 microseconds** per-tick inference latency, validating the theoretical O(1) recurrence property in a production setting. This implementation includes three novel architectures: (1) a selective SSM with input-dependent B, C, dt parameters and volatility-adaptive discretization, (2) a multi-timescale SSM capturing micro/milli/second dynamics simultaneously, and (3) an online learning framework for real-time regime adaptation. All models achieve **>500K ops/s** throughput while maintaining cache-friendly memory access patterns (1–3KB per tick). 
+State space models (SSMs) achieve O(1) per-step inference through their recurrent formulation, yet existing implementations operate at millisecond latencies due to framework overhead, memory allocation, and cache misses. We present StreamSSM, a C++ SSM inference engine that realizes the theoretical O(1) bound in practice, achieving **0.45–1.33 microsecond** per-step latency with full gradient support.
+
+Our implementation introduces three techniques: (1) a fused selective scan that combines projection, discretization, state update, and gating in a single cache-resident pass, (2) volatility-adaptive discretization where the integration step dt scales with input dynamics, improving stability on non-stationary sequences, and (3) multi-scale state decomposition with learned cross-timescale fusion.
+
+We demonstrate two applications: tick-level financial prediction and LLM KV-cache compression. For KV-cache, the SSM compresses O(seq_len) key-value pairs into O(d_state) fixed-size state, enabling constant-memory attention over arbitrarily long contexts. All models sustain **>500K ops/s** throughput while fitting entirely in L1/L2 cache (1–3KB working set).
 
 ## Architecture
 
