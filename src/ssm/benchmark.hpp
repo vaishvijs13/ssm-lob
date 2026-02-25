@@ -10,7 +10,10 @@ struct BenchStats {
   double mean_us = 0.0;
   double p50_us = 0.0;
   double p90_us = 0.0;
+  double p95_us = 0.0;
   double p99_us = 0.0;
+  double p999_us = 0.0;
+  double max_us = 0.0;
   double ops_per_sec = 0.0;
 };
 
@@ -58,7 +61,10 @@ inline BenchStats bench_microseconds(
   st.mean_us = sum / (double)times_us.size();
   st.p50_us = pct(0.50);
   st.p90_us = pct(0.90);
+  st.p95_us = pct(0.95);
   st.p99_us = pct(0.99);
+  st.p999_us = pct(0.999);
+  st.max_us = times_us.empty() ? 0.0 : times_us.back();
 
   double total_s = (t1 - t0) / 1e9;
   st.ops_per_sec = (total_s > 0.0) ? ((double)iters / total_s) : 0.0;
@@ -67,7 +73,10 @@ inline BenchStats bench_microseconds(
             << "  mean=" << st.mean_us << "us"
             << "  p50=" << st.p50_us << "us"
             << "  p90=" << st.p90_us << "us"
+            << "  p95=" << st.p95_us << "us"
             << "  p99=" << st.p99_us << "us"
+            << "  p999=" << st.p999_us << "us"
+            << "  max=" << st.max_us << "us"
             << "  ops/s=" << st.ops_per_sec
             << "\n";
 
