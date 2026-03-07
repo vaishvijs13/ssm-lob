@@ -63,6 +63,7 @@ struct ScanParams {
   const float* b_in;
   float* y;
   float* h_out;
+  float* h_all;
 
   int T;
   int D;
