@@ -43,6 +43,7 @@ public:
     cudaFree(d_h_);
     if (d_x_) cudaFree(d_x_);
     if (d_y_) cudaFree(d_y_);
+    if (d_h_all_) cudaFree(d_h_all_);
   }
 
   void upload_params() {
@@ -74,6 +75,7 @@ public:
     p.b_in = d_b_in_;
     p.y = d_y_;
     p.h_out = d_h_;
+    p.h_all = d_h_all_;
     p.T = T;
     p.D = D_;
     p.D_in = D_in_;
@@ -107,6 +109,7 @@ private:
   float* d_h_ = nullptr;
   float* d_x_ = nullptr;
   float* d_y_ = nullptr;
+  float* d_h_all_ = nullptr;
   int buf_T_ = 0;
 
   //host copies
@@ -121,8 +124,10 @@ private:
     if (T <= buf_T_) return;
     if (d_x_) cudaFree(d_x_);
     if (d_y_) cudaFree(d_y_);
+    if (d_h_all_) cudaFree(d_h_all_);
     CUDA_CHECK(cudaMalloc(&d_x_, T * D_in_ * sizeof(float)));
     CUDA_CHECK(cudaMalloc(&d_y_, T * sizeof(float)));
+    CUDA_CHECK(cudaMalloc(&d_h_all_, T * D_ * sizeof(float)));
     buf_T_ = T;
   }
 };
