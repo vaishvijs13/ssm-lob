@@ -24,15 +24,18 @@ __global__ void selective_scan_fwd_kernel(ScanParams p) {
       u += p.W_in[d * p.D_in + j] * p.x[t * p.D_in + j];
     }
 
-    //ssm update
     float bu = B_d * u;
     h = decay * h + (1.0f - decay) * bu;
+
+    //save for backward
+    if (p.h_all) {
+      p.h_all[t * p.D + d] = h;
+    }
 
     //out contribution
     y_shared[d] = C_d * h;
     __syncthreads();
 
-    //reduce (thread 0 sums)
     if (d == 0) {
       float y_t = 0.0f;
       for (int i = 0; i < p.D; i++) {
