@@ -72,4 +72,4 @@ struct ScanParams {
   float log_dt_hi;
 };
 
-} //namespace ssm_cuda
+}
