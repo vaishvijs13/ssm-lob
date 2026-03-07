@@ -6,7 +6,6 @@ __global__ void selective_scan_fwd_kernel(ScanParams p) {
   int d = threadIdx.x;
   if (d >= p.D) return;
 
-  //precompute discretization for this state dim
   float A = -softplus_d(p.A_log[d]);
   float ld = clamp_d(p.log_dt[d], p.log_dt_lo, p.log_dt_hi);
   float dt = expf(ld);
@@ -14,14 +13,12 @@ __global__ void selective_scan_fwd_kernel(ScanParams p) {
   float B_d = p.B[d];
   float C_d = p.C[d];
 
-  //hidden state for this dim
   float h = 0.0f;
 
   //shared mem for output reduction
   __shared__ float y_shared[256];
 
   for (int t = 0; t < p.T; t++) {
-    //input projection: u = W_in[d,:] @ x[t,:] + b_in[d]
     float u = p.b_in[d];
     for (int j = 0; j < p.D_in; j++) {
       u += p.W_in[d * p.D_in + j] * p.x[t * p.D_in + j];
@@ -31,7 +28,7 @@ __global__ void selective_scan_fwd_kernel(ScanParams p) {
     float bu = B_d * u;
     h = decay * h + (1.0f - decay) * bu;
 
-    //output contribution
+    //out contribution
     y_shared[d] = C_d * h;
     __syncthreads();
 
@@ -46,7 +43,6 @@ __global__ void selective_scan_fwd_kernel(ScanParams p) {
     __syncthreads();
   }
 
-  //store final hidden state
   p.h_out[d] = h;
 }
 
@@ -57,4 +53,4 @@ void selective_scan_fwd(ScanParams& p, cudaStream_t stream) {
   selective_scan_fwd_kernel<<<1, threads, 0, stream>>>(p);
 }
 
-} //namespace ssm_cuda
+}
