@@ -37,6 +37,6 @@ if(NOT GIT_HASH)
   set(GIT_HASH "unknown")
 endif()
 
-add_executable(benchmark_cuda src/benchmark_cuda.cpp)
+add_executable(benchmark_cuda src/benchmark_cuda.cu)
 target_link_libraries(benchmark_cuda ssm_cuda CUDA::cudart)
 target_compile_definitions(benchmark_cuda PRIVATE BUILD_GIT_HASH="${GIT_HASH}")
