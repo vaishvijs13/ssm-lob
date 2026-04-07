@@ -1,10 +1,14 @@
 #pragma once
 
 #include <cuda_runtime.h>
+
+#ifdef __CUDACC__
 #include <cub/cub.cuh>
+#endif
 
 namespace ssm_cuda {
 
+#ifdef __CUDACC__
 constexpr int MAX_D = 256;
 constexpr int THREADS = 128;
 constexpr int ITEMS = 4;
@@ -31,7 +35,9 @@ struct ScanTraits {
 };
 
 using Traits64 = ScanTraits<128, 4, 64>;
+#endif
 
+#ifdef __CUDACC__
 //device math
 __device__ __forceinline__ float softplus_d(float x) {
   return x > 20.0f ? x : logf(1.0f + expf(x));
@@ -44,6 +50,7 @@ __device__ __forceinline__ float sigmoid_d(float x) {
 __device__ __forceinline__ float clamp_d(float x, float lo, float hi) {
   return fminf(fmaxf(x, lo), hi);
 }
+#endif
 
 #define CUDA_CHECK(call) do { \
   cudaError_t err = call; \
