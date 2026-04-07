@@ -8,6 +8,8 @@
 namespace ssm_cuda {
 
 void selective_scan_fwd(ScanParams& p, cudaStream_t stream = 0);
+void selective_scan_fwd_sharedw(ScanParams& p, cudaStream_t stream = 0);
+void selective_scan_fwd_opt(ScanParams& p, cudaStream_t stream = 0);
 
 class StreamingSSMCuda {
 public:
@@ -60,7 +62,8 @@ public:
   }
 
   //run fwd pass on sequence
-  void forward(const float* x, int T, float* y) {
+  //variant: 0=baseline, 1=shared_w, 2=shared_w+warp_reduce (D must==32 for variant 2)
+  void forward(const float* x, int T, float* y, int variant = 0) {
     ensure_buffers(T);
 
     CUDA_CHECK(cudaMemcpy(d_x_, x, T * D_in_ * sizeof(float), cudaMemcpyHostToDevice));
@@ -82,7 +85,9 @@ public:
     p.log_dt_lo = -20.0f;
     p.log_dt_hi = 5.0f;
 
-    selective_scan_fwd(p, stream_);
+    if (variant == 1)      selective_scan_fwd_sharedw(p, stream_);
+    else if (variant == 2) selective_scan_fwd_opt(p, stream_);
+    else                   selective_scan_fwd(p, stream_);
 
     CUDA_CHECK(cudaMemcpy(y, d_y_, T * sizeof(float), cudaMemcpyDeviceToHost));
   }
