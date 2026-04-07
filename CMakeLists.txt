@@ -7,7 +7,7 @@ set(CMAKE_CUDA_STANDARD 17)
 find_package(CUDAToolkit REQUIRED)
 
 #75=turing, 80=ampere, 86=ampere mobile, 89=ada, 90=hopper
-set(CMAKE_CUDA_ARCHITECTURES 80 86 89 90)
+set(CMAKE_CUDA_ARCHITECTURES 75 80 86 89 90)
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
