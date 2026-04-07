@@ -3,8 +3,6 @@ main.cpp
 ssm_demo
 Makefile
 demo
-bench
-bench_results.jsonl
-bench_main.cpp
-perf_results.txt
 .venv/
+build/
+benchmark_cuda
