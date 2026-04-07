@@ -4,7 +4,7 @@
 
 ## Abstract
 
-State space models (SSMs) achieve O(1) per-step inference through their recurrent formulation, yet existing implementations operate at millisecond latencies due to framework overhead, memory allocation, and cache misses. We present StreamSSM, a C++ SSM inference engine that realizes the theoretical O(1) bound in practice, achieving **0.45–1.33 microsecond** per-step latency with full gradient support.
+State space models (SSMs) achieve O(1) per-step inference through their recurrent formulation, yet existing implementations operate at millisecond latencies due to framework overhead, memory allocation, and cache misses. We present StreamSSM, a C++ SSM inference engine that realizes the theoretical O(1) bound in practice. On a T4, the optimized CUDA kernel processes a step in **0.574 µs** end-to-end including device transfer. On an A100, **0.217 µs**.
 
 Our implementation introduces three techniques: (1) a fused selective scan that combines projection, discretization, state update, and gating in a single cache-resident pass, (2) volatility-adaptive discretization where the integration step dt scales with input dynamics, improving stability on non-stationary sequences, and (3) multi-scale state decomposition with learned cross-timescale fusion.
 
