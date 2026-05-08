@@ -1,4 +1,4 @@
-# [StreamSSM](https://www.vaishvishah.com/ssmstream)
+# StreamSSM
 
 **Microsecond-Latency State Space Models for Real-Time Sequential Inference**
 
