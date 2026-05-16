@@ -4,11 +4,17 @@
 
 ## Abstract
 
-State space models (SSMs) achieve O(1) per-step inference through their recurrent formulation, yet existing implementations operate at millisecond latencies due to framework overhead, memory allocation, and cache misses. We present StreamSSM, a C++ SSM inference engine that realizes the theoretical O(1) bound in practice. On a T4, the optimized CUDA kernel processes a step in **0.574 µs** end-to-end including device transfer. On an A100, **0.217 µs**.
+The recurrence in state space models is constant-time by definition, but that property only appears in practice if the system is structured around it. Framework-based implementations introduce allocation, scheduling, and memory movement that dominate the cost of the recurrence itself.
 
-Our implementation introduces three techniques: (1) a fused selective scan that combines projection, discretization, state update, and gating in a single cache-resident pass, (2) volatility-adaptive discretization where the integration step dt scales with input dynamics, improving stability on non-stationary sequences, and (3) multi-scale state decomposition with learned cross-timescale fusion.
+StreamSSM is a C++ runtime for streaming SSMs built around a single constraint: minimize per-step latency. The system exposes a `forward_step` interface that processes one input and updates the hidden state in place. Each step executes as a single fused pass with no intermediate tensors and no dynamic allocation in the hot path.
 
-We demonstrate two applications: tick-level financial prediction and LLM KV-cache compression. For KV-cache, the SSM compresses O(seq_len) key-value pairs into O(d_state) fixed-size state, enabling constant-memory attention over arbitrarily long contexts. All models sustain **>500K ops/s** throughput while fitting entirely in L1/L2 cache (1–3KB working set).
+At typical settings (D=32, D_in=13), the working set remains on the order of a few kilobytes, allowing the full update to fit within L1 cache. Per-step latency ranges from **0.67µs to 2.08µs** on CPU, with P50 at **0.75µs**. On GPU, the optimized kernel with warp shuffle reduction achieves **0.574µs** (T4) and **0.217µs** (A100) end-to-end including transfer.
+
+The implementation includes:
+- **Selective SSM**: Input-dependent B, C, Δt through a single projection, with volatility-adaptive discretization
+- **Multi-scale SSM**: Parallel state updates at different decay rates to capture dynamics at multiple timescales  
+- **Online learning**: Lightweight SGD updates to the output head using realized outcomes
+- **KV-cache compression**: Fixed-size state representation that compresses O(seq_len) to O(d_state), achieving 40× compression at 8K tokens and 170× at 32K
 
 ## Architecture
 

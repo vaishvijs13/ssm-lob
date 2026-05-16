@@ -30,8 +30,7 @@ inline void matmul_f32_nn(
 
 inline std::shared_ptr<Tensor> matmul2d_cpu_kernel(
   const std::shared_ptr<Tensor>& A,
-  const std::shared_ptr<Tensor>& B,
-  bool blocked = false
+  const std::shared_ptr<Tensor>& B
 ) {
   if (!A || !B) throw std::runtime_error("matmul2d_cpu_kernel: null tensor");
   if (!A->is_contiguous() || !B->is_contiguous()) throw std::runtime_error("matmul2d_cpu_kernel: requires contiguous");
@@ -45,12 +44,11 @@ inline std::shared_ptr<Tensor> matmul2d_cpu_kernel(
 
   vector_float out((Size)M * (Size)N, 0.0f);
 
-  const float* Ap = A->data.data();
-  const float* Bp = B->data.data();
+  const float* Ap = A->storage->data() + A->offset;
+  const float* Bp = B->storage->data() + B->offset;
   float* Cp = out.data();
 
-  if (blocked) matmul_f32_nn_blocked(Ap, Bp, Cp, M, K, N);
-  else         matmul_f32_nn(Ap, Bp, Cp, M, K, N);
+  matmul_f32_nn(Ap, Bp, Cp, M, K, N);
 
   return std::make_shared<Tensor>(std::move(out), vector_int{M, N}, false);
 }
